@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temlas Properties — Short-Let & Property Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #111820;
+    --gold: #B8963E;
+    --gold-light: #D4AF63;
+    --gold-pale: #F5EDD8;
+    --stone: #F0EDE8;
+    --slate: #5C6370;
+    --white: #FFFFFF;
+    --green: #1E4D35;
+    --teal: #1A3D4F;
+    --border: #DDD8D0;
+    box-sizing: border-box;
+  }
+  *, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Manrope', sans-serif; background: var(--white); color: var(--ink); line-height: 1.6; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(17,24,32,0.97);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    z-index: 100;
+    border-bottom: 1px solid rgba(184,150,62,0.2);
+  }
+  .nav-brand { display: flex; flex-direction: column; }
+  .nav-brand-main {
+    font-family: 'Playfair Display', serif;
+    color: var(--white);
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+  }
+  .nav-brand-main span { color: var(--gold); }
+  .nav-brand-sub {
+    font-size: 0.58rem;
+    color: #5C6370;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: #C8D0D8;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    background: var(--gold) !important;
+    color: var(--ink) !important;
+    padding: 9px 20px;
+    border-radius: 4px;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+  }
+  .nav-cta:hover { background: var(--gold-light) !important; }
+  @media (max-width: 640px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--teal);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 50%, rgba(184,150,62,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(184,150,62,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+    align-items: center;
+    position: relative;
+  }
+  .hero-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 28px; height: 1.5px;
+    background: var(--gold);
+  }
+  .hero-left h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+  .hero-left h1 em {
+    font-style: normal;
+    color: var(--gold);
+  }
+  .hero-left p {
+    color: rgba(255,255,255,0.65);
+    font-size: 1rem;
+    max-width: 460px;
+    margin-bottom: 36px;
+    line-height: 1.75;
+  }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+    padding: 14px 28px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); }
+  .btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.85);
+    padding: 14px 28px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Hero right: income card */
+  .hero-income-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(184,150,62,0.25);
+    border-radius: 12px;
+    padding: 28px;
+    backdrop-filter: blur(8px);
+  }
+  .income-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .income-label::after {
+    content: '● YORK LIVE DATA';
+    font-size: 0.6rem;
+    color: #4CAF50;
+    letter-spacing: 0.08em;
+  }
+  .income-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .income-row:last-child { border-bottom: none; }
+  .income-row .ir-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+  .income-row .ir-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--white); }
+  .income-row .ir-val.gold { color: var(--gold); }
+  .income-divider {
+    margin: 16px 0 10px;
+    padding: 14px;
+    background: rgba(184,150,62,0.1);
+    border-radius: 6px;
+    border-left: 3px solid var(--gold);
+  }
+  .income-divider p { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+  .income-divider .big { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--gold); }
+  .income-divider .big-sub { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-left: 4px; }
+
+  @media (max-width: 768px) {
+    .hero { padding: 100px 20px 60px; }
+    .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    .hero-income-card { display: none; }
+  }
+
+  /* PROBLEM STRIP */
+  .problem-strip {
+    background: var(--gold-pale);
+    padding: 32px 48px;
+    border-top: 2px solid var(--gold);
+  }
+  .problem-strip-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .problem-strip .ps-head {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-right: 8px;
+  }
+  .problem-strip .ps-item {
+    font-size: 0.78rem;
+    color: var(--slate);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .problem-strip .ps-item::before { content: '→'; color: var(--gold); font-weight: 700; }
+  @media (max-width: 640px) {
+    .problem-strip { padding: 24px 20px; }
+    .problem-strip-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* FREE REVIEW SECTION */
+  .free-review {
+    background: var(--white);
+    padding: 88px 48px;
+  }
+  .free-review-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .section-tag {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    padding: 4px 11px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .free-review-left h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .free-review-left p {
+    color: var(--slate);
+    font-size: 0.9rem;
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+  .review-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .review-points li {
+    font-size: 0.85rem;
+    color: var(--ink);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 500;
+  }
+  .review-points li .rp-icon {
+    width: 22px; height: 22px;
+    background: var(--gold-pale);
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    color: var(--gold);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Review form box */
+  .review-box {
+    background: var(--ink);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 8px 40px rgba(17,24,32,0.15);
+  }
+  .review-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .review-box .rb-sub {
+    font-size: 0.75rem;
+    color: #8A95A3;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .rb-field { margin-bottom: 13px; }
+  .rb-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #8A95A3;
+    margin-bottom: 5px;
+    letter-spacing: 0.04em;
+  }
+  .rb-field input,
+  .rb-field select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    font-family: 'Manrope', sans-serif;
+    color: var(--white);
+    transition: border-color 0.2s;
+  }
+  .rb-field input::placeholder { color: #5C6370; }
+  .rb-field input:focus,
+  .rb-field select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .rb-field select { color: #8A95A3; }
+  .rb-field select option { background: var(--ink); color: var(--white); }
+  .btn-review-dark {
+    width: 100%;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    border-radius: 5px;
+    padding: 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.2s;
+  }
+  .btn-review-dark:hover { background: var(--gold-light); }
+  .rb-note { font-size: 0.67rem; color: #5C6370; text-align: center; margin-top: 10px; }
+
+  @media (max-width: 860px) {
+    .free-review { padding: 64px 20px; }
+    .free-review-inner { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  /* SERVICES */
+  .services {
+    background: var(--stone);
+    padding: 88px 48px;
+  }
+  .section-inner { max-width: 1080px; margin: 0 auto; }
+  .section-header { text-align: center; margin-bottom: 52px; }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .section-header p { color: var(--slate); font-size: 0.9rem; max-width: 500px; margin: 0 auto; }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .svc {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 24px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .svc:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.07); transform: translateY(-2px); }
+  .svc.featured {
+    background: var(--teal);
+    border-color: var(--gold);
+  }
+  .svc-icon { font-size: 1.6rem; margin-bottom: 14px; display: block; }
+  .svc h3 { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .svc.featured h3 { color: var(--gold); }
+  .svc p { font-size: 0.8rem; color: var(--slate); line-height: 1.65; }
+  .svc.featured p { color: rgba(255,255,255,0.6); }
+  .svc-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .services { padding: 64px 20px; }
+    .services-grid { grid-template-columns: 1fr; }
+  }
+
+  /* HOW IT WORKS */
+  .how {
+    background: var(--white);
+    padding: 88px 48px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 26px;
+    left: calc(12.5% + 12px);
+    right: calc(12.5% + 12px);
+    height: 1px;
+    background: var(--border);
+  }
+  .step { text-align: center; }
+  .step-num {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+  }
+  .step h3 { font-size: 0.9rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .step p { font-size: 0.79rem; color: var(--slate); line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    .how { padding: 64px 20px; }
+    .steps { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .steps::before { display: none; }
+  }
+
+  /* SOCIAL PROOF / TRUST STRIP */
+  .trust {
+    background: var(--teal);
+    padding: 64px 48px;
+  }
+  .trust-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .trust-item { text-align: center; }
+  .trust-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .trust-desc { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+  @media (max-width: 640px) {
+    .trust { padding: 48px 20px; }
+    .trust-inner { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* WHO WE HELP */
+  .who {
+    background: var(--stone);
+    padding: 88px 48px;
+  }
+  .who-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .who-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 28px 24px;
+    border: 1.5px solid var(--border);
+  }
+  .who-card .wc-for {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .who-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .who-card p { font-size: 0.8rem; color: var(--slate); line-height: 1.65; margin-bottom: 18px; }
+  .who-card a {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .who-card a:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .who { padding: 64px 20px; }
+    .who-grid { grid-template-columns: 1fr; }
+  }
+
+  /* CONTACT */
+  .contact { background: var(--white); padding: 88px 48px; }
+  .contact-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .form-card {
+    background: var(--stone);
+    border-radius: 10px;
+    padding: 36px;
+    border: 1.5px solid var(--border);
+  }
+  .form-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .form-card .form-sub { font-size: 0.78rem; color: var(--slate); margin-bottom: 22px; }
+  .form-field { margin-bottom: 13px; }
+  .form-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--slate);
+    margin-bottom: 4px;
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    font-family: 'Manrope', sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    transition: border-color 0.2s;
+    resize: none;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus { outline: none; border-color: var(--gold); }
+  .form-btn {
+    width: 100%;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    border-radius: 5px;
+    padding: 13px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s;
+  }
+  .form-btn:hover { background: var(--gold-light); }
+  .form-success {
+    display: none;
+    background: #D8F3DC;
+    color: var(--green);
+    border-radius: 5px;
+    padding: 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .contact { padding: 64px 20px; }
+    .contact-inner { grid-template-columns: 1fr; }
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    padding: 40px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+    border-top: 1px solid rgba(184,150,62,0.15);
+  }
+  .footer-col {}
+  .footer-brand-main {
+    font-family: 'Playfair Display', serif;
+    color: var(--white);
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+  }
+  .footer-brand-main span { color: var(--gold); }
+  .footer-brand-sub {
+    font-size: 0.6rem;
+    color: #5C6370;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .footer-parent {
+    font-size: 0.7rem;
+    color: #3A4450;
+    line-height: 1.7;
+  }
+  .footer-links { display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a {
+    font-size: 0.75rem;
+    color: #5C6370;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+  footer .footer-legal {
+    font-size: 0.68rem;
+    color: #3A4450;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 640px) {
+    footer { padding: 28px 20px; flex-direction: column; }
+    footer .footer-legal { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-brand-main">Temlas <span>Properties</span></div>
+    <div class="nav-brand-sub">A TEMLAS GROUP COMPANY</div>
+  </div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#how">How It Works</a>
+    <a href="#who">Who We Help</a>
+    <a href="#contact">Contact</a>
+    <a href="#free-review" class="nav-cta">Free Property Review</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">PROPERTY MANAGEMENT · DEAL SOURCING · YORK & UK</div>
+      <h1>Your property.<br><em>Working harder</em><br>for you.</h1>
+      <p>Temlas Properties manages short-lets, sources below-market deals, and runs guaranteed rent arrangements — so landlords and investors earn more without the workload.</p>
+      <div class="hero-btns">
+        <a href="#free-review" class="btn-primary">Book Free Property Review</a>
+        <a href="#services" class="btn-ghost">See Our Services</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-income-card">
+        <div class="income-label">YORK SHORT-LET MARKET</div>
+        <div class="income-row">
+          <span class="ir-label">Average nightly rate</span>
+          <span class="ir-val gold">£148</span>
+        </div>
+        <div class="income-row">
+          <span class="ir-label">Average occupancy</span>
+          <span class="ir-val gold">68%</span>
+        </div>
+        <div class="income-row">
+          <span class="ir-label">Active listings</span>
+          <span class="ir-val">1,797</span>
+        </div>
+        <div class="income-row">
+          <span class="ir-label">Solo-managed hosts</span>
+          <span class="ir-val">602</span>
+        </div>
+        <div class="income-divider">
+          <p>Average annual income at market rates</p>
+          <span class="big">£33,000</span><span class="big-sub">/year</span>
+        </div>
+        <p style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:6px;">Most hosts earning significantly less — poor pricing, slow response, or no optimisation. We fix that.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM STRIP -->
+<div class="problem-strip">
+  <div class="problem-strip-inner">
+    <span class="ps-head">Sound familiar?</span>
+    <span class="ps-item">Guests not booking despite good reviews</span>
+    <span class="ps-item">Too much time managing messages</span>
+    <span class="ps-item">Not sure if you're priced right</span>
+    <span class="ps-item">Property sitting empty between tenancies</span>
+    <span class="ps-item">Don't know if your deal stacks up</span>
+    <span class="ps-item">Can't visit the property before committing</span>
+  </div>
+</div>
+
+<!-- FREE REVIEW -->
+<section class="free-review" id="free-review">
+  <div class="free-review-inner">
+    <div class="free-review-left">
+      <span class="section-tag">Free — No Obligation</span>
+      <h2>Book your free<br>property income review</h2>
+      <p>In 30 minutes, we analyse your property together and show you exactly what it could be earning — and what's standing in the way. No sales pressure. Just numbers.</p>
+      <ul class="review-points">
+        <li>
+          <span class="rp-icon">✓</span>
+          <span>We review your current setup and identify income gaps against the live market</span>
+        </li>
+        <li>
+          <span class="rp-icon">✓</span>
+          <span>You get a personalised income projection — realistic, not inflated</span>
+        </li>
+        <li>
+          <span class="rp-icon">✓</span>
+          <span>We present a done-for-you management proposal if the numbers make sense</span>
+        </li>
+        <li>
+          <span class="rp-icon">✓</span>
+          <span>100% free. Property management firms charge £300+ for the same analysis.</span>
+        </li>
+        <li>
+          <span class="rp-icon">✓</span>
+          <span>No commitment, no obligation — just clarity on what your property is worth</span>
+        </li>
+      </ul>
+    </div>
+    <div class="review-box">
+      <h3>Claim your free review</h3>
+      <p class="rb-sub">30 seconds to fill in. We confirm a time within 24 hours.</p>
+      <div class="rb-field"><label>YOUR NAME</label><input type="text" placeholder="First and last name"></div>
+      <div class="rb-field"><label>EMAIL ADDRESS</label><input type="email" placeholder="you@email.com"></div>
+      <div class="rb-field"><label>PHONE NUMBER</label><input type="tel" placeholder="+44 7700 000000"></div>
+      <div class="rb-field">
+        <label>YOU ARE A…</label>
+        <select>
+          <option value="">Select one</option>
+          <option>Airbnb / short-let host</option>
+          <option>Buy-to-let landlord</option>
+          <option>New to property</option>
+          <option>Property investor</option>
+          <option>Looking to sell</option>
+        </select>
+      </div>
+      <div class="rb-field"><label>PROPERTY LOCATION</label><input type="text" placeholder="e.g. York, Leeds, Manchester"></div>
+      <button class="btn-review-dark" onclick="submitForm('review-success')">Book My Free Review →</button>
+      <div class="form-success" id="review-success">Done! We'll be in touch within 24 hours to confirm your time.</div>
+      <p class="rb-note">🔒 Your details are never shared with third parties.<br>Temlas Properties — Trading name of Temlas Group Limited.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2>What Temlas Properties does</h2>
+      <p>End-to-end property income management — from finding the deal to running it day to day.</p>
+    </div>
+    <div class="services-grid">
+      <div class="svc featured">
+        <span class="svc-badge">MOST POPULAR</span>
+        <span class="svc-icon">🏠</span>
+        <h3>SA Management</h3>
+        <p>Full serviced accommodation management on Airbnb and Booking.com. Listing setup, dynamic pricing, guest messaging, check-in/out, cleaning coordination, and monthly owner reports. You earn. We operate.</p>
+      </div>
+      <div class="svc">
+        <span class="svc-icon">🔍</span>
+        <h3>Deal Sourcing</h3>
+        <p>We find below-market-value properties with strong yield potential, run the full due diligence, and hand investors a packaged deal pack with all the numbers done.</p>
+      </div>
+      <div class="svc">
+        <span class="svc-icon">🔁</span>
+        <h3>Rent to Rent</h3>
+        <p>We lease your property on a guaranteed monthly rent, convert it to a high-performing short-let, and manage everything. You receive a fixed income with zero voids and zero hassle.</p>
+      </div>
+      <div class="svc">
+        <span class="svc-icon">🧹</span>
+        <h3>Cleaning & Turnovers</h3>
+        <p>Professional cleaning coordinated between every guest stay. Linen, restocking, quality checks — all handled so your listing stays 5-star ready at all times.</p>
+      </div>
+      <div class="svc">
+        <span class="svc-icon">🔧</span>
+        <h3>Maintenance Coordination</h3>
+        <p>Rapid response maintenance with trusted local contractors. We handle the calls, quotes, and follow-up — protecting your asset without adding to your workload.</p>
+      </div>
+      <div class="svc">
+        <span class="svc-icon">🎥</span>
+        <h3>Remote Property Viewing</h3>
+        <p>Based overseas, relocating, or too far to visit in person? We attend the property on your behalf and conduct a thorough live or recorded video walkthrough — for buyers, investors, and tenants alike. Make confident decisions without travelling, and avoid wasting time on properties that don't match the photos.</p>
+      </div>
+      <div class="svc">
+        <span class="svc-icon">📊</span>
+        <h3>Property Consultancy</h3>
+        <p>Want to understand your options before committing? We offer property income strategy sessions for landlords and investors exploring their next move.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2>How it works</h2>
+      <p>From your first call to your first managed booking — a straightforward four-step process.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Free review call</h3>
+        <p>We look at your property or portfolio together and show you what the numbers could look like under professional management.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>We agree a plan</h3>
+        <p>You choose the service that fits. We draw up a clear management agreement — no hidden fees, no ambiguity.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>We set everything up</h3>
+        <p>Listing created, pricing optimised, cleaning team booked, messaging automated. Your property is ready to perform.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>You receive your income</h3>
+        <p>Monthly statements, transparent reporting, and your share of the income — transferred on a regular schedule. You do nothing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST NUMBERS -->
+<section class="trust">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <div class="trust-num">£148</div>
+      <div class="trust-desc">Average nightly rate in York —<br>a market we know inside out</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-num">68%</div>
+      <div class="trust-desc">Market occupancy rate — we target<br>above this with active management</div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-num">20%</div>
+      <div class="trust-desc">Our management fee — you keep<br>the rest, with nothing to manage</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO WE HELP -->
+<section class="who" id="who">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2>Who we work with</h2>
+      <p>Whether you're new to short-lets or looking to scale a portfolio — Temlas Properties has a model that works for you.</p>
+    </div>
+    <div class="who-grid">
+      <div class="who-card">
+        <div class="wc-for">FOR AIRBNB HOSTS</div>
+        <h3>Take back your evenings</h3>
+        <p>You listed your property to earn extra income — not to become a full-time host. We take on all the guest management so the income keeps coming in without the stress.</p>
+        <a href="#free-review">Book a free review →</a>
+      </div>
+      <div class="who-card">
+        <div class="wc-for">FOR LANDLORDS</div>
+        <h3>Earn more from your property</h3>
+        <p>If you're getting £800/month on a long let when the short-let market offers £1,800+, we can show you how to bridge that gap — or offer you guaranteed rent under our R2R model.</p>
+        <a href="#free-review">See what your property could earn →</a>
+      </div>
+      <div class="who-card">
+        <div class="wc-for">FOR INVESTORS</div>
+        <h3>Deals you can act on</h3>
+        <p>We source below-market-value properties with strong cashflow potential, present the full numbers, and handle management once acquired. One point of contact from deal to income.</p>
+        <a href="#contact">Register as an investor →</a>
+      </div>
+      <div class="who-card">
+        <div class="wc-for">FOR TENANTS</div>
+        <h3>View any property remotely</h3>
+        <p>Moving to a new city, relocating for work, or just can't get there before someone else takes it? We visit the property for you, conduct a live video walkthrough, and give you an honest report — so you can sign with confidence, not blind faith.</p>
+        <a href="#contact">Book a remote viewing →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2>Get in touch</h2>
+      <p>Whether you have a property to manage or a deal to discuss — email us at <a href="mailto:properties@temlas.co.uk" style="color:var(--gold);text-decoration:none;font-weight:600;">properties@temlas.co.uk</a> or use the forms below. We respond within one business day.</p>
+    </div>
+    <div class="contact-inner">
+      <div class="form-card">
+        <h3>I have a property to manage</h3>
+        <p class="form-sub">SA management, rent to rent, or cleaning services.</p>
+        <div class="form-field"><label>Full Name</label><input type="text" placeholder="Your name"></div>
+        <div class="form-field"><label>Email Address</label><input type="email" placeholder="you@email.com"></div>
+        <div class="form-field"><label>Phone Number</label><input type="tel" placeholder="+44 7700 000000"></div>
+        <div class="form-field"><label>Property Location</label><input type="text" placeholder="Town or city"></div>
+        <div class="form-field">
+          <label>Service Interested In</label>
+          <select>
+            <option>SA Management (Airbnb / short-let)</option>
+            <option>Rent to Rent (guaranteed income)</option>
+            <option>Cleaning & Turnovers</option>
+            <option>Maintenance Coordination</option>
+            <option>Remote Property Viewing</option>
+            <option>Not sure — book a review</option>
+          </select>
+        </div>
+        <button class="form-btn" onclick="submitForm('mgmt-success')">Send Enquiry</button>
+        <div class="form-success" id="mgmt-success">Thank you — we'll be in touch within one business day.</div>
+      </div>
+      <div class="form-card">
+        <h3>I'm a property investor</h3>
+        <p class="form-sub">Register your buying criteria and we'll send matching deals.</p>
+        <div class="form-field"><label>Full Name</label><input type="text" placeholder="Your name"></div>
+        <div class="form-field"><label>Email Address</label><input type="email" placeholder="you@email.com"></div>
+        <div class="form-field"><label>Phone Number</label><input type="tel" placeholder="+44 7700 000000"></div>
+        <div class="form-field">
+          <label>Investment Strategy</label>
+          <select>
+            <option>Buy to Let</option>
+            <option>HMO</option>
+            <option>Serviced Accommodation</option>
+            <option>Rent to Rent</option>
+            <option>Flip / Refurb</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Budget Range</label>
+          <select>
+            <option>Under £100,000</option>
+            <option>£100,000 – £200,000</option>
+            <option>£200,000 – £350,000</option>
+            <option>£350,000+</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Target Areas</label><input type="text" placeholder="e.g. York, Leeds, North Yorkshire"></div>
+        <button class="form-btn" onclick="submitForm('inv-success')">Register as Investor</button>
+        <div class="form-success" id="inv-success">Registered — we'll be in touch when a matching deal comes through.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-col">
+    <div class="footer-brand-main">Temlas <span>Properties</span></div>
+    <div class="footer-brand-sub">PROPERTY MANAGEMENT & INVESTMENT</div>
+    <div class="footer-parent">Trading name of Temlas Group Limited<br>Registered in England & Wales<br>temlas.co.uk</div>
+    <div style="margin-top:12px;"><a href="mailto:properties@temlas.co.uk" style="font-size:0.75rem;color:var(--gold);text-decoration:none;">properties@temlas.co.uk</a></div>
+  </div>
+  <div class="footer-col">
+    <div class="footer-links">
+      <a href="#free-review">Free Property Review</a>
+      <a href="#services">Our Services</a>
+      <a href="#how">How It Works</a>
+      <a href="#who">Who We Help</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+  <div class="footer-legal">
+    Temlas Properties is a trading name of Temlas Group Limited<br>
+    Company No: [Your Companies House Number]<br>
+    © 2026 Temlas Group Limited. All rights reserved.<br>
+    <span style="color:#2A3440;">Property sourcing involves risk. Independent legal advice recommended.</span>
+  </div>
+</footer>
+
+<script>
+  function submitForm(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
